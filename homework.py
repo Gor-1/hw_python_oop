@@ -1,16 +1,15 @@
+from dataclasses import dataclass
+
+
+@dataclass
 class InfoMessage:
     """Информационное сообщение о тренировке."""
-    def __init__(self,
-                 training_type: str,
-                 duration: float,
-                 distance: float,
-                 speed: float,
-                 calories: float) -> None:
-        self.training_type = training_type
-        self.duration = duration
-        self.distance = distance
-        self.speed = speed
-        self.calories = calories
+
+    training_type: str
+    duration: float
+    distance: float
+    speed: float
+    calories: float
 
     def get_message(self) -> str:
         return (
@@ -103,7 +102,7 @@ class SportsWalking(Training):
 
     def get_spent_calories(self) -> float:
         return ((self.CALORIES_WEIGHT_MULTIPLIER * self.weight
-                + (((self.get_mean_speed() * self.KMH_IN_MSEC)) ** 2)
+                + ((self.get_mean_speed() * self.KMH_IN_MSEC) ** 2)
                 / (self.height / self.CM_IN_M)
                 * self.CALORIES_SPEED_HEIGHT_MULTIPLIER
                 * self.weight) * self.duration * self.MIN_IN_H
@@ -147,20 +146,16 @@ def read_package(
     data: list
 ) -> Training:
     """Прочитать данные полученные от датчиков."""
-    trenings_data: dict = {'RUN': Running,
-                           'SWM': Swimming,
-                           'WLK': SportsWalking}
-    if workout_type in trenings_data:
-        return trenings_data[workout_type](*data)
-    else:
-        print(f'{workout_type} вида тренировок программа не поддержывает!')
+    trenings_data: dict[str, Training] = {'RUN': Running,
+                                          'SWM': Swimming,
+                                          'WLK': SportsWalking}
+    return trenings_data[workout_type](*data)
 
 
 def main(training: Training) -> None:
     """Главная функция."""
     info = training.show_training_info()
     print(info.get_message())
-    pass
 
 
 if __name__ == '__main__':
