@@ -1,4 +1,5 @@
 from dataclasses import asdict, dataclass
+from typing import Type
 
 
 @dataclass
@@ -17,7 +18,7 @@ class InfoMessage:
     calories: float
 
     def get_message(self) -> str:
-        return (self.WORKOUT_MESSAGE.format(**asdict(self)))
+        return self.WORKOUT_MESSAGE.format(**asdict(self))
 
 
 class Training:
@@ -111,7 +112,7 @@ class SportsWalking(Training):
 class Swimming(Training):
     """Тренировка: плавание."""
 
-    LEN_STEP = 1.38
+    LEN_STEP: float = 1.38
     CALORIES_MEAN_SPEED_SHIFT: float = 1.1
     CALORIES_WEIGHT_MULTIPLIER: int = 2
 
@@ -145,9 +146,12 @@ def read_package(
     data: list
 ) -> Training:
     """Прочитать данные полученные от датчиков."""
-    trenings_data: dict[str, Training] = {'RUN': Running,
-                                          'SWM': Swimming,
-                                          'WLK': SportsWalking}
+    trenings_data: dict[str, Type[Training]] = {
+        'RUN': Running,
+        'SWM': Swimming,
+        'WLK': SportsWalking}
+    if workout_type not in trenings_data:
+        raise ValueError("Нет такого вида тренировки!")
     return trenings_data[workout_type](*data)
 
 
